@@ -1,0 +1,27 @@
+{
+  "name": "zplug-daemon",
+  "version": "0.0.0",
+  "description": "A Daemon for zplug",
+  "main": "main.js",
+  "dependencies": {
+    "util": "^0.10.3",
+    "slack-node": "0.0.95",
+    "github": "~0.2.3",
+    "hashtable": "^0.5.2",
+    "request": "~2.51.0",
+    "sprintf": "^0.1.5",
+    "time": "~0.11.0",
+    "ws": "^0.6.5",
+    "moment-timezone": "~0.3.0",
+    "node-getopt": "~0.2.3",
+    "bluebird": "^2.9.7",
+    "events": "^1.0.2",
+    "forever": "~0.15.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "b4b4r07",
+  "license": "MIT"
+}
