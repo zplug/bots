@@ -1,3 +1,8 @@
+/*
+ * Help:
+ * bot merge 123
+ */
+
 var moment = require('moment');
 var sprintf = require('sprintf');
 var botkit = require('botkit');

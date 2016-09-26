@@ -1,3 +1,8 @@
+/*
+ * Help:
+ * #123
+ */
+
 var sprintf = require('sprintf');
 var botkit = require('botkit');
 
