@@ -1,3 +1,0 @@
-[submodule "twistd"]
-	path = twistd
-	url = https://github.com/b4b4r07/twistd
