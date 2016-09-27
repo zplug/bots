@@ -1,6 +1,6 @@
 /*
  * Help:
- * bot help
+ * :question: bot help
  */
 
 var botkit = require('botkit');

@@ -1,6 +1,6 @@
 /*
  * Help:
- * #123
+ * :hash: #123
  */
 
 var sprintf = require('sprintf');

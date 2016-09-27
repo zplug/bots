@@ -1,6 +1,6 @@
 /*
  * Help:
- * bot bump 1.2.3
+ * :dolphin: bot bump 1.2.3
  */
 
 var botkit = require('botkit');
