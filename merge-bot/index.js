@@ -1,6 +1,6 @@
 /*
  * Help:
- * bot merge 123
+ * :bot: bot merge 123
  */
 
 var moment = require('moment');
