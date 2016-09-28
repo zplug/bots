@@ -1,8 +1,8 @@
 /*
  * Help:
  * :robot_face: bot list
- * :robot_face: bot start
- * :robot_face: bot stop
+ * :robot_face: bot start {xxx-bot}
+ * :robot_face: bot stop {xxx-bot}
  */
 
 var botkit = require('botkit');
