@@ -4,7 +4,7 @@
  * :robot_face: bot start {xxx-bot} | all
  * :robot_face: bot stop {xxx-bot} | all
  * :robot_face: bot restart {xxx-bot} | all
- * :robot_face: bot status {xxx-bot}
+ * :robot_face: bot status
  */
 
 var botkit = require('botkit');
