@@ -1,9 +1,9 @@
 /*
  * Help:
  * :robot_face: bot list
- * :robot_face: bot start {xxx-bot}
- * :robot_face: bot stop {xxx-bot}
- * :robot_face: bot restart {xxx-bot}
+ * :robot_face: bot start {xxx-bot} | all
+ * :robot_face: bot stop {xxx-bot} | all
+ * :robot_face: bot restart {xxx-bot} | all
  */
 
 var botkit = require('botkit');
