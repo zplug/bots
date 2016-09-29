@@ -1,0 +1,1 @@
+../uptime-bot/uptime.sh
