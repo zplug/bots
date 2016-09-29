@@ -3,6 +3,7 @@
  * :robot_face: bot list
  * :robot_face: bot start {xxx-bot}
  * :robot_face: bot stop {xxx-bot}
+ * :robot_face: bot restart {xxx-bot}
  */
 
 var botkit = require('botkit');
@@ -71,6 +72,40 @@ controller.hears(['^bot\\s+start(\\s+(\\S+))?'],
                     text: stdout,
                     icon_emoji: ':robot_face:',
                     username: 'manage bot',
+                });
+            });
+        });
+
+controller.hears(['^bot\\s+restart(\\s+(\\S+))?'],
+        ['message_received', 'ambient'],
+        function(bot, message) {
+            var name = message.match[1];
+            exec(__dirname + '/stop.sh ' + name, function(err, stdout, stderr) {
+                if (err) {
+                    return bot.reply(message, {
+                        text: stderr,
+                        icon_emoji: ':robot_face:',
+                        username: 'manage bot',
+                    });
+                }
+                bot.reply(message, {
+                    text: stdout,
+                    icon_emoji: ':robot_face:',
+                    username: 'manage bot',
+                });
+                exec(__dirname + '/start.sh ' + name, function(err, stdout, stderr) {
+                    if (err) {
+                        return bot.reply(message, {
+                            text: stderr,
+                            icon_emoji: ':robot_face:',
+                            username: 'manage bot',
+                        });
+                    }
+                    return bot.reply(message, {
+                        text: stdout,
+                        icon_emoji: ':robot_face:',
+                        username: 'manage bot',
+                    });
                 });
             });
         });
