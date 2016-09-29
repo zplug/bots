@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cnt=0
 dir="$(cd $(dirname $0)/..; pwd)"
 
+ret=0
 bot="$1"
 forever=$dir/node_modules/.bin/forever
 
@@ -11,16 +11,38 @@ if [[ -z $bot ]] || [[ $bot == undefined ]]; then
     exit 1
 fi
 
-for pid in $($forever list | grep $bot | awk '{print $3}')
-do
-    let cnt++
-    $forever stop $pid &>/dev/null
-    if (( $? == 0 )); then
-        echo "killed $bot ($pid)"
-    fi
-done
+if [[ $bot == 'all' ]]; then
+    for bot in $dir/*-bot
+    do
+        name="${bot##*/}"
+        if [[ ! -f $bot/index.js ]]; then
+            echo "$name: no such bot" >&2
+            ret=1
+            continue
+        fi
 
-if (( $cnt == 0 )); then
+        if [[ $name == 'manage-bot' ]]; then
+            echo "$name: skipped (need manually)"
+            continue
+        fi
+
+        $forever stop $bot/index.js &>/dev/null
+        if (( $? == 0 )); then
+            echo "stopped $name!"
+        else
+            echo "failed to stop $name ..." >&2
+            ret=1
+        fi
+    done
+    exit $ret
+fi
+
+if [[ -f $dir/$bot/index.js ]]; then
+    $forever stop $dir/$bot/index.js &>/dev/null
+    if (( $? == 0 )); then
+        echo "stopped $bot!"
+    fi
+else
     echo "no such bot" >&2
     exit 1
 fi
