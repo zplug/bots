@@ -20,6 +20,17 @@ controller.spawn({
     token: SLACK_TOKEN
 }).startRTM();
 
+var attachments = function(args) {
+    return {
+        'username': 'manage bot' ,
+        'attachments': [{
+            'text': args.text,
+            'color': args.color,
+        }],
+        'icon_emoji': ':robot_face:'
+    }
+}
+
 controller.hears(['^bot\\s+list'],
         ['message_received', 'ambient'],
         function(bot, message) {
@@ -43,17 +54,15 @@ controller.hears(['^bot\\s+stop(\\s+(\\S+))?'],
             var name = message.match[1];
             exec(__dirname + '/stop.sh ' + name, function(err, stdout, stderr) {
                 if (err) {
-                    return bot.reply(message, {
+                    return bot.reply(message, attachments({
                         text: stderr,
-                        icon_emoji: ':robot_face:',
-                        username: 'manage bot',
-                    });
+                        color: '#ff0000',
+                    }));
                 }
-                return bot.reply(message, {
+                return bot.reply(message, attachments({
                     text: stdout,
-                    icon_emoji: ':robot_face:',
-                    username: 'manage bot',
-                });
+                    color: '#00ff00',
+                }));
             });
         });
 
@@ -63,17 +72,15 @@ controller.hears(['^bot\\s+start(\\s+(\\S+))?'],
             var name = message.match[1];
             exec(__dirname + '/start.sh ' + name, function(err, stdout, stderr) {
                 if (err) {
-                    return bot.reply(message, {
+                    return bot.reply(message, attachments({
                         text: stderr,
-                        icon_emoji: ':robot_face:',
-                        username: 'manage bot',
-                    });
+                        color: '#ff0000',
+                    }));
                 }
-                return bot.reply(message, {
+                return bot.reply(message, attachments({
                     text: stdout,
-                    icon_emoji: ':robot_face:',
-                    username: 'manage bot',
-                });
+                    color: '#00ff00',
+                }));
             });
         });
 
@@ -83,30 +90,26 @@ controller.hears(['^bot\\s+restart(\\s+(\\S+))?'],
             var name = message.match[1];
             exec(__dirname + '/stop.sh ' + name, function(err, stdout, stderr) {
                 if (err) {
-                    return bot.reply(message, {
+                    return bot.reply(message, attachments({
                         text: stderr,
-                        icon_emoji: ':robot_face:',
-                        username: 'manage bot',
-                    });
+                        color: '#ff0000',
+                    }));
                 }
-                bot.reply(message, {
+                bot.reply(message, attachments({
                     text: stdout,
-                    icon_emoji: ':robot_face:',
-                    username: 'manage bot',
-                });
+                    color: '#00ff00',
+                }));
                 exec(__dirname + '/start.sh ' + name, function(err, stdout, stderr) {
                     if (err) {
-                        return bot.reply(message, {
+                        return bot.reply(message, attachments({
                             text: stderr,
-                            icon_emoji: ':robot_face:',
-                            username: 'manage bot',
-                        });
+                            color: '#ff0000',
+                        }));
                     }
-                    return bot.reply(message, {
+                    return bot.reply(message, attachments({
                         text: stdout,
-                        icon_emoji: ':robot_face:',
-                        username: 'manage bot',
-                    });
+                        color: '#00ff00',
+                    }));
                 });
             });
         });
