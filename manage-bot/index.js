@@ -36,10 +36,7 @@ controller.hears(['^bot\\s+list'],
         function(bot, message) {
             exec(__dirname + '/list.sh', function(err, stdout, stderr) {
                 if (err) { console.log(err); }
-                var fields = JSON.parse(stdout);
-                var attachments = [{
-                    fields: fields,
-                }]
+                var attachments = JSON.parse(stdout);
                 return bot.reply(message, {
                     attachments: attachments,
                     icon_emoji: ':robot_face:',
