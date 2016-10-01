@@ -5,6 +5,7 @@
  * :robot_face: bot stop {xxx-bot} | all
  * :robot_face: bot restart {xxx-bot} | all
  * :robot_face: bot status
+ * :robot_face: bot log {xxx-bot}
  */
 
 var botkit = require('botkit');
@@ -131,5 +132,24 @@ controller.hears(['^bot\\s+status'],
                     icon_emoji: ':robot_face:',
                     username: 'manage bot',
                 });
+            });
+        });
+
+controller.hears(['^bot\\s+log(\\s+(\\S+)(\\s+(\\d+))?)?'],
+        ['message_received', 'ambient'],
+        function(bot, message) {
+            var name = message.match[1];
+            var line = message.match[2];
+            exec(__dirname + '/log.sh ' + name + ' ' + line, function(err, stdout, stderr) {
+                if (err) {
+                    return bot.reply(message, attachments({
+                        text: stderr,
+                        color: '#ff0000',
+                    }));
+                }
+                return bot.reply(message, attachments({
+                    text: stdout,
+                    color: '#00ff00',
+                }));
             });
         });
