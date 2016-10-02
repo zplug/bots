@@ -9,7 +9,6 @@ if [[ -z $new_version ]]; then
     exit 1
 fi
 
-cat <<EOF
 git -C "$work_dir" remote add origin git@github.com.zplug:zplug/zplug.git
 git -C "$work_dir" config user.email "b4b4r07+zplug@gmail.com"
 git -C "$work_dir" config user.name "zplug-man"
@@ -26,5 +25,4 @@ curl --data \
     "draft": false, \
     "prerelease": false \
     }' \
-    "https://api.github.com/repos/zplug/zplug/releases?access_token=ACCESS_TOKEN"
-EOF
+    "https://api.github.com/repos/zplug/zplug/releases?access_token=$GITHUB_ACCESS_TOKEN"

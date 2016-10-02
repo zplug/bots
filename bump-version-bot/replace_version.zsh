@@ -35,9 +35,6 @@ if is-at-least $new_version $old_version; then
     exit 1
 fi
 
-# TODO
-#ssh -T git@github.com.zplug 2>&1
-
 for file in /tmp/zplug/{README.md,doc/guide/ja/README.md,base/core/core.zsh}
 do
     perl -pi -e 's/'$old_version'/'$new_version'/g' "$file"

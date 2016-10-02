@@ -1,0 +1,44 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":robot_face: manage-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/manage-bot",
+        "title": "manage bot",
+        "title_link": "",
+        "text": "A bot to manage all other zplug bots on this Slack",
+        "fields": [
+            {
+                "title": "bot list",
+                "value": "make a list of all zplug bots",
+                "short": false
+            },
+            {
+                "title": "bot start {xxx-bot} | all",
+                "value": "start a bot",
+                "short": false
+            },
+            {
+                "title": "bot stop {xxx-bot} | all",
+                "value": "stop a bot",
+                "short": false
+            },
+            {
+                "title": "bot restart {xxx-bot} | all",
+                "value": "restart a bot",
+                "short": false
+            },
+            {
+                "title": "bot status",
+                "value": "make a list of all bots' status",
+                "short": false
+            },
+            {
+                "title": "bot log {xxx-bot}",
+                "value": "show a bot's log",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]
