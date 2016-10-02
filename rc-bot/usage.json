@@ -1,0 +1,18 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": "run-command bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/rc-bot",
+        "title": ":trollface: bot rc {command}",
+        "text": "run shell commands easily through Slack interface",
+        "fields": [
+            {
+                "title": "",
+                "value": "",
+                "short": true
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]
