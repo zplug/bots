@@ -24,4 +24,4 @@ if [[ $2 =~ [0-9]+ ]]; then
     line=$2
 fi
 log_file=$(echo "$bot_list" | grep "$bot" | awk '{print $2}')
-tail -n ${line:-10} "$log_file"
+tail -n ${line:-30} "$log_file"
