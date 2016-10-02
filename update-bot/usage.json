@@ -1,0 +1,19 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":up: update-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/update-bot",
+        "title": "update bot",
+        "title_link": "https://github.com/zplug/bots/tree/master/update-bot",
+        "text": "A bot to update by itself",
+        "fields": [
+            {
+                "title": "bot update",
+                "value": "Update all bots from Slack UI",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]

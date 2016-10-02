@@ -1,0 +1,19 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":question: help-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/help-bot",
+        "title": "help bot",
+        "title_link": "https://github.com/zplug/bots/tree/master/help-bot",
+        "text": "A bot to show bot usages",
+        "fields": [
+            {
+                "title": "bot help [{xxx-bot}]",
+                "value": "Show usage of all bots on Slack. If an argument is passed, show its bot's usage",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]

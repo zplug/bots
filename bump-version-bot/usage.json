@@ -1,0 +1,19 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":dolphin: bump-version-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/bump-version-bot",
+        "title": "bump bot",
+        "title_link": "https://github.com/zplug/bots/tree/master/bump-version-bot",
+        "text": "A bot to bump version of zplug on Slack",
+        "fields": [
+            {
+                "title": "bot bump {n.n.n}",
+                "value": "bump version",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]

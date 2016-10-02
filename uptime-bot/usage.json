@@ -1,0 +1,19 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":bar_chart: uptime-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/uptime-bot",
+        "title": "uptime bot",
+        "title_link": "https://github.com/zplug/bots/tree/master/uptime-bot",
+        "text": "A bot to show bot uptime",
+        "fields": [
+            {
+                "title": "bot uptime",
+                "value": "Show uptime of all bots on Slack",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]

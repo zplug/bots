@@ -5,11 +5,11 @@
         "author_name": ":trollface: rc-bot",
         "author_link": "https://github.com/zplug/bots/tree/master/rc-bot",
         "title": "run-command bot",
-        "title_link": "",
+        "title_link": "https://github.com/zplug/bots/tree/master/rc-bot",
         "text": "Run shell commands easily through Slack interface",
         "fields": [
             {
-                "title": "> bot rc {command}",
+                "title": "bot rc {command}",
                 "value": "",
                 "short": false
             }

@@ -1,0 +1,19 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":hash: hashtag-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/hashtag-bot",
+        "title": "hashtag bot",
+        "title_link": "https://github.com/zplug/bots/tree/master/hashtag-bot",
+        "text": "A bot to link number to github issues/pull-reqs",
+        "fields": [
+            {
+                "title": "{#nnn}",
+                "value": "link number to github issues/pull-reqs",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]

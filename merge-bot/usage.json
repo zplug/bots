@@ -1,0 +1,19 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":bot: merge-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/merge-bot",
+        "title": "merge bot",
+        "title_link": "https://github.com/zplug/bots/tree/master/merge-bot",
+        "text": "A bot to m merge an opened Pull Requests on GitHub from Slack UI",
+        "fields": [
+            {
+                "title": "bot merge {nnn}",
+                "value": "Merge a mergable P-R",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]
