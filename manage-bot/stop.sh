@@ -41,6 +41,9 @@ if [[ -f $dir/$bot/index.js ]]; then
     $forever stop $dir/$bot/index.js &>/dev/null
     if (( $? == 0 )); then
         echo "stopped $bot!"
+    else
+        echo "already stopped $bot" >&2
+        exit 1
     fi
 else
     echo "no such bot" >&2

@@ -41,6 +41,9 @@ if [[ -f $dir/$bot/index.js ]]; then
     $forever start $dir/$bot/index.js &>/dev/null
     if (( $? == 0 )); then
         echo "started $bot!"
+    else
+        echo "already started $bot" >&2
+        exit 1
     fi
 else
     echo "no such bot" >&2
