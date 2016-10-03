@@ -4,6 +4,7 @@
  */
 
 var botkit = require('botkit');
+var sprintf = require('sprintf');
 var exec = require('child_process').exec;
 var config = {
     slack: {
@@ -41,12 +42,14 @@ controller.hears(['^bot\\s+bump\\s+(\\S+)'],
 
             convoCtx.bot.startConversation(convoCtx.message, function(err, convo) {
                 convo.ask({
-                    text: 'Write release note:',
+                    text: 'Write release note:\n(type `skip` if you want to skip this)',
                     icon_emoji: config.slack.icon_emoji,
                     username: config.slack.username,
                 }, function(response, convo) {
                     var note = response.text;
-
+                    if (note == 'skip') {
+                        note = '';
+                    }
                     exec(__dirname + '/replace_version.zsh ' + version, function(err, stdout, stderr){
                         if (err) {
                             convo.say({
@@ -56,8 +59,31 @@ controller.hears(['^bot\\s+bump\\s+(\\S+)'],
                             });
                             return;
                         }
+                        /*
+                        if (!stdout) {
+                            convo.say({
+                                text: sprintf('ERROR: %s already bumped', version),
+                                icon_emoji: config.slack.icon_emoji,
+                                username: config.slack.username,
+                            });
+                            return;
+                        }
+                        */
+                        var params = {
+                            token: SLACK_TOKEN,
+                            content: stdout,
+                            filetype: 'diff',
+                            filename: '',
+                            title: sprintf('zplug%s-1.patch', version.replace(/\./g, '')),
+                            channels: message.channel
+                        };
+                        bot.api.files.upload(params, function(err, res) {
+                            if (err) {
+                                bot.botkit.log('Failed to request of GitHub API:', err);
+                            }
+                        });
                         convo.ask({
-                            text: 'diff is here:\n```' + stdout + '```\nok? (yes/no):',
+                            text: 'ok? (yes/no):',
                             icon_emoji: config.slack.icon_emoji,
                             username: config.slack.username,
                         });
@@ -66,7 +92,7 @@ controller.hears(['^bot\\s+bump\\s+(\\S+)'],
                                 [{
                                     pattern: convoCtx.bot.utterances.yes,
                                     callback: function(response, convo) {
-                                        exec(__dirname + '/create_releases.zsh ' + version + ' "' + note + '"', function(err, stdout, stderr){
+                                        exec(__dirname + '/create_releases.zsh ' + version + ' ' + note, function(err, stdout, stderr){
                                             if (err) {
                                                 return convo.say({
                                                     text: 'ERROR:\n```' + stderr + '```',
@@ -81,7 +107,6 @@ controller.hears(['^bot\\s+bump\\s+(\\S+)'],
                                                 username: config.slack.username,
                                             });
                                         });
-                                        // });
                                         convo.next();
                                     }
                                 }, {

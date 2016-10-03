@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+set -e
+
 # is-at-least 4.3.10 $ZSH_VERSION
 autoload -Uz is-at-least
 
@@ -17,6 +19,7 @@ if [[ ! -d $work_dir ]]; then
 fi
 
 git -C "$work_dir" checkout .
+git -C "$work_dir" pull
 old_version="$(cat "$work_dir"/README.md | grep '^.latest-badge' | sed 's/^.*latest-v//;s/-ca7f85.*$//')"
 new_version="$1"
 
@@ -27,6 +30,11 @@ fi
 
 if [[ -z $new_version ]]; then
     echo "specify a new version (current: $old_version)" >&2
+    exit 1
+fi
+
+if [[ $new_version == $old_version ]]; then
+    echo "same version" >&2
     exit 1
 fi
 
