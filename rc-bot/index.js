@@ -5,6 +5,7 @@
 
 var botkit = require('botkit');
 var exec = require('child_process').exec;
+var stripAnsi = require('strip-ansi');
 
 var SLACK_TOKEN = process.env.SLACK_TOKEN;
 
@@ -58,7 +59,11 @@ controller.hears(['^bot\\s+rc(\\s+(.+))?$'],
                     color: config.colors.fail,
                 }));
             }
-            exec(command, function(err, stdout, stderr){
+            var options = {
+                shell: '/bin/zsh',
+                cwd: process.env.HOME,
+            };
+            exec(command, options, function(err, stdout, stderr){
                 if (err) {
                     return bot.reply(message, attachments({
                         text: stderr,
@@ -66,7 +71,7 @@ controller.hears(['^bot\\s+rc(\\s+(.+))?$'],
                     }));
                 }
                 return bot.reply(message, attachments({
-                    text: stdout,
+                    text: stripAnsi(stdout),
                     color: config.colors.pass,
                 }));
             });
