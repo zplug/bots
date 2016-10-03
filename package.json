@@ -11,7 +11,8 @@
     "forever": "^0.15.2",
     "github": "^2.4.1",
     "moment": "^2.14.1",
-    "sprintf": "^0.1.5"
+    "sprintf": "^0.1.5",
+    "glob": "~7.1.0"
   },
   "devDependencies": {},
   "scripts": {
