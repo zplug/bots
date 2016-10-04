@@ -1,0 +1,19 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":construction_worker: travis-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/travis-bot",
+        "title": "travis bot",
+        "title_link": "https://github.com/zplug/bots/tree/master/travis-bot",
+        "text": "A bot to call Travis API. e.g. build",
+        "fields": [
+            {
+                "title": "bot travis build",
+                "value": "Build a new test",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]
