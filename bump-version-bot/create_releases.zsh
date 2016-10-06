@@ -32,7 +32,7 @@ http_code=$(
 curl \
     --data "$API_JSON" \
     --silent --output /dev/stderr --write-out "%{http_code}" \
-    https://api.github.com/repos/zplug/zplug/releases?access_token=$GITHUB_ACCESS_TOKEN
+    "https://api.github.com/repos/zplug/zplug/releases?access_token=$GITHUB_ACCESS_TOKEN"
 )
 if (( $http_code == 200 )); then
     echo "Created releases successfully!"

@@ -6,6 +6,7 @@
 var botkit = require('botkit');
 var sprintf = require('sprintf');
 var exec = require('child_process').exec;
+var shellescape = require('shell-escape');
 var config = {
     slack: {
         icon_emoji: ':dolphin:',
@@ -92,7 +93,7 @@ controller.hears(['^bot\\s+bump\\s+(\\S+)'],
                                 [{
                                     pattern: convoCtx.bot.utterances.yes,
                                     callback: function(response, convo) {
-                                        exec(__dirname + '/create_releases.zsh ' + version + ' ' + note, function(err, stdout, stderr){
+                                        exec(__dirname + '/create_releases.zsh ' + version + ' ' + shellescape([note]), function(err, stdout, stderr) {
                                             if (err) {
                                                 return convo.say({
                                                     text: 'ERROR:\n```' + stderr + '```',
