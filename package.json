@@ -15,7 +15,9 @@
     "glob": "~7.1.0",
     "strip-ansi": "~3.0.1",
     "bluebird": "~3.4.6",
-    "shell-escape": "~0.2.0"
+    "shell-escape": "~0.2.0",
+    "escape-json-node": "~1.0.8",
+    "shell-quote": "~1.6.1"
   },
   "devDependencies": {},
   "scripts": {
