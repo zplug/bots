@@ -12,6 +12,8 @@ var config = {
     },
     users: {
         'U0WFNAD1N': 'b4b4r07',
+        'U0WG3LZKL': 'nigorojr',
+        'U0WSAUZEG': 'ress997',
     },
     colors: {
         'pass': '#00ff00',
