@@ -6,7 +6,12 @@
 var botkit = require('botkit');
 var sprintf = require('sprintf');
 var exec = require('child_process').exec;
-var shellescape = require('shell-escape');
+var request = require('request');
+var escapeJSON = require('escape-json-node');
+var Promise = require("bluebird");
+var githubAPI = require('github');
+var shell = require('./shellHelper');
+
 var config = {
     slack: {
         icon_emoji: ':dolphin:',
@@ -15,6 +20,7 @@ var config = {
 }
 
 var SLACK_TOKEN = process.env.SLACK_TOKEN;
+var GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 
 var controller = botkit.slackbot({
     debug: false
@@ -23,6 +29,17 @@ var controller = botkit.slackbot({
 controller.spawn({
     token: SLACK_TOKEN
 }).startRTM();
+
+github = new githubAPI({
+    version: '3.0.0',
+    debug: false,
+    Promise: Promise
+});
+
+github.authenticate({
+    type: 'oauth',
+    token: GITHUB_ACCESS_TOKEN
+});
 
 controller.hears(['^bot\\s+bump\\s+(\\S+)'],
         ['message_received', 'ambient'],
@@ -60,7 +77,6 @@ controller.hears(['^bot\\s+bump\\s+(\\S+)'],
                             });
                             return;
                         }
-                        /*
                         if (!stdout) {
                             convo.say({
                                 text: sprintf('ERROR: %s already bumped', version),
@@ -69,7 +85,6 @@ controller.hears(['^bot\\s+bump\\s+(\\S+)'],
                             });
                             return;
                         }
-                        */
                         var params = {
                             token: SLACK_TOKEN,
                             content: stdout,
@@ -93,45 +108,51 @@ controller.hears(['^bot\\s+bump\\s+(\\S+)'],
                                 [{
                                     pattern: convoCtx.bot.utterances.yes,
                                     callback: function(response, convo) {
-                                        exec(__dirname + '/create_releases.zsh ' + version + ' ' + shellescape([note]), function(err, stdout, stderr) {
-                                            if (err) {
-                                                return convo.say({
-                                                    text: 'ERROR:\n```' + stderr + '```',
+                                        shell.series([
+                                                'git -C /tmp/zplug remote set-url origin git@github.com.zplug:zplug/zplug.git',
+                                                'git -C /tmp/zplug config user.email "b4b4r07+zplug@gmail.com"',
+                                                'git -C /tmp/zplug config user.name "zplug-man"',
+                                                'git -C /tmp/zplug add -A',
+                                                'git -C /tmp/zplug commit -m "Bump ' + version + '"',
+                                                'git -C /tmp/zplug push origin master'
+                                        ], function(err) {
+                                            github.repos.createRelease({
+                                                user: "zplug",
+                                                repo: "zplug",
+                                                tag_name: version,
+                                                name: version,
+                                                body: note,
+                                            }).then(function(res, err) {
+                                                bot.reply(message, {
+                                                    text: 'zplug '+res.tag_name+' has been released!',
                                                     icon_emoji: config.slack.icon_emoji,
                                                     username: config.slack.username,
-                                                });
-                                            }
-                                            convoCtx.bot.botkit.log(stdout);
-                                            convo.say({
-                                                text: '```' + stdout + '```',
-                                                icon_emoji: config.slack.icon_emoji,
-                                                username: config.slack.username,
+                                                })});
+                                            convo.next();
+                                        });
+                                    }
+                                    }, {
+                                        pattern: convoCtx.bot.utterances.no,
+                                        callback: function(response, convo) {
+                                            convoCtx.bot.api.reactions.add({
+                                                timestamp: response.ts,
+                                                channel: response.channel,
+                                                name: 'ok_woman',
+                                            }, function(err, _) {
+                                                if (err) {
+                                                    convoCtx.bot.botkit.log('Failed to add emoji reaction:', err);
+                                                }
                                             });
-                                        });
-                                        convo.next();
-                                    }
-                                }, {
-                                    pattern: convoCtx.bot.utterances.no,
-                                    callback: function(response, convo) {
-                                        convoCtx.bot.api.reactions.add({
-                                            timestamp: response.ts,
-                                            channel: response.channel,
-                                            name: 'ok_woman',
-                                        }, function(err, _) {
-                                            if (err) {
-                                                convoCtx.bot.botkit.log('Failed to add emoji reaction:', err);
-                                            }
-                                        });
-                                        convo.next();
-                                    }
-                                }, {
-                                    default: true,
-                                    callback: function(response, convo) {
-                                        convo.repeat();
-                                        convo.next();
-                                    }
-                                }]);
+                                            convo.next();
+                                        }
+                                    }, {
+                                        default: true,
+                                        callback: function(response, convo) {
+                                            convo.repeat();
+                                            convo.next();
+                                        }
+                                    }]);
+                                });
                     });
                 });
             });
-        });

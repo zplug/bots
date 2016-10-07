@@ -43,7 +43,7 @@ if is-at-least $new_version $old_version; then
     exit 1
 fi
 
-for file in /tmp/zplug/{README.md,doc/guide/ja/README.md,base/core/core.zsh}
+for file in /tmp/zplug/{README.md,doc/guide/ja/README.md,base/core/core.zsh,doc/VERSION}
 do
     perl -pi -e 's/'$old_version'/'$new_version'/g' "$file"
 done
