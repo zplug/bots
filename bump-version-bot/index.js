@@ -1,8 +1,3 @@
-/*
- * Help:
- * :dolphin: bot bump {n.n.n}
- */
-
 var botkit = require('botkit');
 var sprintf = require('sprintf');
 var exec = require('child_process').exec;

@@ -1,8 +1,3 @@
-/*
- * Help:
- * :hash: {#nnn}
- */
-
 var sprintf = require('sprintf');
 var botkit = require('botkit');
 

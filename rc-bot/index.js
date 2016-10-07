@@ -1,8 +1,3 @@
-/*
- * Help:
- * :trollface: bot rc {command}
- */
-
 var botkit = require('botkit');
 var exec = require('child_process').exec;
 var stripAnsi = require('strip-ansi');

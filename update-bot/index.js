@@ -1,8 +1,3 @@
-/*
- * Help:
- * :up: bot update
- */
-
 var botkit = require('botkit');
 var exec = require('child_process').exec;
 

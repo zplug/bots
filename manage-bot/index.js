@@ -1,13 +1,3 @@
-/*
- * Help:
- * :robot_face: bot list
- * :robot_face: bot start {xxx-bot} | all
- * :robot_face: bot stop {xxx-bot} | all
- * :robot_face: bot restart {xxx-bot} | all
- * :robot_face: bot status
- * :robot_face: bot log {xxx-bot}
- */
-
 var botkit = require('botkit');
 var exec = require('child_process').exec;
 

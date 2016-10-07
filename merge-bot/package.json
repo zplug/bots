@@ -1,0 +1,17 @@
+{
+  "name": "merge-bot",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "b4b4r07",
+  "license": "MIT",
+  "dependencies": {
+    "botkit": "~0.2.2",
+    "moment": "~2.15.1",
+    "sprintf": "~0.1.5",
+    "github": "~4.0.0"
+  }
+}

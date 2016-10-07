@@ -1,8 +1,3 @@
-/*
- * Help:
- * :bar_chart: bot uptime
- */
-
 var botkit = require('botkit');
 var exec = require('child_process').exec;
 

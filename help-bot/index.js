@@ -1,8 +1,3 @@
-/*
- * Help:
- * :question: bot help
- */
-
 var botkit = require('botkit');
 var exec = require('child_process').exec;
 
