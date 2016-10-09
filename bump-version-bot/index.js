@@ -36,9 +36,25 @@ github.authenticate({
     token: GITHUB_ACCESS_TOKEN
 });
 
+var format = function(args) {
+    return {
+        'attachments': [{
+            'text': args.text,
+            'color': args.color,
+        }],
+        'icon_emoji': config.slack.icon_emoji,
+        'username': config.slack.username,
+    }
+}
+
 controller.hears(['^bot\\s+bump\\s+now'],
         ['message_received', 'ambient'],
         function(bot, message) {
+            return bot.reply(message, format({
+                text: 'DEPRECATED: Use version-bot instead',
+                color: '#ff0000',
+            }));
+            /*
             exec(__dirname + '/now.sh', function(err, stdout, stderr) {
                 if (err) {
                     return bot.reply(message, {
@@ -53,11 +69,17 @@ controller.hears(['^bot\\s+bump\\s+now'],
                     username: config.slack.username,
                 });
             });
+            */
         });
 
 controller.hears(['^bot\\s+bump\\s+(\\d+\.\\d+\.\\d+)'],
         ['message_received', 'ambient'],
         function(bot, message) {
+            return bot.reply(message, format({
+                text: 'DEPRECATED: Use version-bot instead',
+                color: '#ff0000',
+            }));
+            /*
             var version = message.match[1];
             if (! version.match(/^\d+\.\d+\.\d+/)) {
                 return bot.reply(message, {
@@ -169,4 +191,5 @@ controller.hears(['^bot\\s+bump\\s+(\\d+\.\\d+\.\\d+)'],
                                 });
                     });
                 });
+            */
             });
