@@ -1,0 +1,24 @@
+[
+    {
+        "fallback": "",
+        "color": "",
+        "author_name": ":rocket: version-bot",
+        "author_link": "https://github.com/zplug/bots/tree/master/version-bot",
+        "title": "version bot",
+        "title_link": "https://github.com/zplug/bots/tree/master/version-bot",
+        "text": "A version-controll bot on Slack",
+        "fields": [
+            {
+                "title": "bot (ver|version) now",
+                "value": "show current version",
+                "short": false
+            },
+            {
+                "title": "bot (ver|version) bump {n.n.n}",
+                "value": "bump version",
+                "short": false
+            }
+        ],
+        "footer": "zplug bot"
+    }
+]
