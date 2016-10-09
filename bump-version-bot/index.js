@@ -36,7 +36,26 @@ github.authenticate({
     token: GITHUB_ACCESS_TOKEN
 });
 
-controller.hears(['^bot\\s+bump\\s+(\\S+)'],
+controller.hears(['^bot\\s+bump\\s+now'],
+        ['message_received', 'ambient'],
+        function(bot, message) {
+            exec(__dirname + '/now.sh', function(err, stdout, stderr) {
+                if (err) {
+                    return bot.reply(message, {
+                        text: 'ERROR:\n```' + stderr + '```',
+                        icon_emoji: config.slack.icon_emoji,
+                        username: config.slack.username,
+                    });
+                }
+                return bot.reply(message, {
+                    text: '```' + stdout + '```',
+                    icon_emoji: config.slack.icon_emoji,
+                    username: config.slack.username,
+                });
+            });
+        });
+
+controller.hears(['^bot\\s+bump\\s+(\\d+\.\\d+\.\\d+)'],
         ['message_received', 'ambient'],
         function(bot, message) {
             var version = message.match[1];

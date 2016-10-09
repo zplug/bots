@@ -9,6 +9,11 @@
         "text": "A bot to bump version of zplug on Slack",
         "fields": [
             {
+                "title": "bot bump now",
+                "value": "show current version",
+                "short": false
+            },
+            {
                 "title": "bot bump {n.n.n}",
                 "value": "bump version",
                 "short": false
