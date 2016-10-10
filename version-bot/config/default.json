@@ -1,0 +1,20 @@
+{
+    "path": {
+        "remote": "zplug/zplug",
+        "local": "/tmp/zplug"
+    },
+    "slack": {
+        "token": "",
+        "username": "version bot",
+        "icon_emoji": ":rocket:"
+    },
+    "github": {
+        "token": "",
+        "username": "zplug-man",
+        "email": "b4b4r07+zplug@gmail.com",
+        "url": "git@github.com:zplug/zplug",
+        "remote": "git@github.com.zplug:zplug/zplug.git",
+        "user": "zplug",
+        "repo": "zplug"
+    }
+}
