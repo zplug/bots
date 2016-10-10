@@ -3,11 +3,14 @@ var sprintf = require('sprintf');
 var exec = require('child_process').exec;
 var request = require('request');
 var escapeJSON = require('escape-json-node');
-var Promise = require("bluebird");
+var Promise = require('bluebird');
 var githubAPI = require('github');
 var shell = require('./helpers/shell.js');
 var fs = require('fs');
 var semver = require('semver');
+var replace = require('replace');
+var repo = '/tmp/test';
+var git = require('simple-git')(repo);
 
 var config = {
     slack: {
@@ -30,7 +33,7 @@ controller.spawn({
 github = new githubAPI({
     version: '3.0.0',
     debug: false,
-    Promise: Promise
+    Promise: Promise,
 });
 
 github.authenticate({
@@ -93,162 +96,160 @@ var commandProcMap = {
         });
     },
     bump: function(bot, message) {
-            var version = message.match[2] || '';
-            if (! semver.valid(version)) {
+        var version = message.match[2] || '';
+        if (!semver.valid(version)) {
+            return bot.reply(message, {
+                text: 'ERROR: version (n.n.n) is acceptable.',
+                icon_emoji: config.slack.icon_emoji,
+                username: config.slack.username,
+            });
+        }
+
+        var currentVersion = fs.readFileSync(repo + "/doc/VERSION").toString().trim('\n');
+        var nextVersion = version;
+        if (!semver.cmp(currentVersion, '<', nextVersion)) {
+            return bot.reply(message, {
+                text: 'ERROR: ' + nextVersion + ' is less than current version ' + currentVersion,
+                icon_emoji: config.slack.icon_emoji,
+                username: config.slack.username,
+            });
+        }
+        switch (nextVersion) {
+            case semver.inc(currentVersion, 'patch'):
+            case semver.inc(currentVersion, 'minor'):
+            case semver.inc(currentVersion, 'major'):
+                break;
+            default:
                 return bot.reply(message, {
-                    text: 'ERROR: version (n.n.n) is acceptable.',
+                    text: 'ERROR: ' + nextVersion + ' is too large compared with current version' + currentVersion,
                     icon_emoji: config.slack.icon_emoji,
                     username: config.slack.username,
                 });
-            }
+        }
 
-            var currentVersion = fs.readFileSync("/tmp/zplug/doc/VERSION").toString().trim('\n');
-            var nextVersion = version;
+        var convoCtx = {
+            bot: bot,
+            message: message
+        };
 
-            if (! semver.cmp(currentVersion, '<', nextVersion)) {
-                return bot.reply(message, {
-                    text: 'ERROR: ' + nextVersion + ' is less than current version ' + currentVersion,
-                    icon_emoji: config.slack.icon_emoji,
-                    username: config.slack.username,
-                });
-            }
-            switch (nextVersion) {
-                case semver.inc(currentVersion, 'patch'):
-                case semver.inc(currentVersion, 'minor'):
-                case semver.inc(currentVersion, 'major'):
-                    break;
-                default:
-                    return bot.reply(message, {
-                        text: 'ERROR: ' + nextVersion + ' is too large compared with current version' + currentVersion,
-                        icon_emoji: config.slack.icon_emoji,
-                        username: config.slack.username,
-                    });
-            }
-
-            var convoCtx = {
-                bot: bot,
-                message: message
-            };
-
-            convoCtx.bot.startConversation(convoCtx.message, function(err, convo) {
-                convo.ask({
-                    text: 'Upgrade ' + semver.diff(currentVersion, nextVersion) + ' version\n' + 'Write release note:\n(type `skip` if you want to skip this)',
-                    icon_emoji: config.slack.icon_emoji,
-                    username: config.slack.username,
-                }, function(response, convo) {
-                    var note = response.text;
-                    if (note == 'skip') {
-                        note = '';
-                    }
-                    bot.reply(message, {
-                        text: 'Processing...',
-                        icon_emoji: config.slack.icon_emoji,
-                        username: config.slack.username,
-                    });
-                    exec(__dirname + '/helpers/bump.sh ' + version, function(err, stdout, stderr){
-                        if (err) {
-                            convo.say({
-                                text: 'ERROR:\n```' + stderr + '```',
-                                icon_emoji: config.slack.icon_emoji,
-                                username: config.slack.username,
-                            });
-                            convo.next();
-                            return;
-                        }
-                        var params = {
-                            token: SLACK_TOKEN,
-                            content: stdout,
-                            filetype: 'diff',
-                            filename: '',
-                            title: sprintf('zplug%s-1.patch', version.replace(/\./g, '')),
-                            channels: message.channel
-                        };
-                        bot.api.files.upload(params, function(err, res) {
-                            if (err) {
-                                bot.botkit.log('Failed to request of GitHub API:', err);
-                            }
+        convoCtx.bot.startConversation(convoCtx.message, function(err, convo) {
+            convo.ask({
+                text: sprintf('Upgrade %s version\nWrite release note:\n(type `skip` to pass this)',
+                    semver.diff(currentVersion, nextVersion)
+                ),
+                icon_emoji: config.slack.icon_emoji,
+                username: config.slack.username,
+            }, function(response, convo) {
+                var note = response.text;
+                git
+                    .checkout('.')
+                    .pull('origin', 'master')
+                    .then(function() {
+                        replace({
+                            regex: currentVersion,
+                            replacement: nextVersion,
+                            paths: [
+                                repo + '/doc/VERSION',
+                                repo + '/README.md',
+                                repo + '/doc/guide/ja/README.md',
+                                repo + '/base/core/core.zsh',
+                            ],
+                            recursive: false,
+                            silent: true,
                         });
-                        convo.ask({
-                            text: 'ok? (yes/no):',
+                    })
+                    .add('./*')
+                    .commit('Bump ' + nextVersion)
+                    .push('origin', 'master')
+                    .then(function() {
+                        bot.reply(message, {
+                            text: 'Creating releases...',
                             icon_emoji: config.slack.icon_emoji,
                             username: config.slack.username,
                         });
-                        convo.next();
-                        convo.ask('',
-                                [{
-                                    pattern: convoCtx.bot.utterances.yes,
-                                    callback: function(response, convo) {
-                                        shell.series([
-                                                'git -C /tmp/zplug remote set-url origin git@github.com.zplug:zplug/zplug.git',
-                                                'git -C /tmp/zplug config user.email "b4b4r07+zplug@gmail.com"',
-                                                'git -C /tmp/zplug config user.name "zplug-man"',
-                                                'git -C /tmp/zplug add -A',
-                                                'git -C /tmp/zplug commit -m "Bump ' + version + '"',
-                                                'git -C /tmp/zplug push origin master'
-                                        ], function(err) {
-                                            github.repos.createRelease({
-                                                user: "zplug",
-                                                repo: "zplug",
-                                                tag_name: version,
-                                                name: version,
-                                                body: note,
-                                            }).then(function(res, err) {
-                                                var reply_with_attachments = {
-                                                    'text': 'zplug '+res.tag_name+' has been released!',
-                                                    'icon_emoji': config.slack.icon_emoji,
-                                                    'username': config.slack.username,
-                                                    'attachments': [{
-                                                        'fields': [{
-                                                            'title': 'Releases',
-                                                            'value': res.html_url,
-                                                            'short': true,
-                                                        }, {
-                                                            'title': 'Release note',
-                                                            'value': res.body,
-                                                            'short': true,
-                                                        }],
-                                                    }]
-                                                }
-                                                bot.reply(message, reply_with_attachments);
-                                            });
-                                            convo.next();
-                                        });
-                                    }
-                                    }, {
-                                        pattern: convoCtx.bot.utterances.no,
-                                        callback: function(response, convo) {
-                                            exec('git -C /tmp/zplug checkout .', function(err, stdout, stderr) {
-                                            });
-                                            convoCtx.bot.api.reactions.add({
-                                                timestamp: response.ts,
-                                                channel: response.channel,
-                                                name: 'ok_woman',
-                                            }, function(err, _) {
-                                                if (err) {
-                                                    convoCtx.bot.botkit.log('Failed to add emoji reaction:', err);
-                                                }
-                                            });
-                                            convo.next();
-                                        }
-                                    }, {
-                                        default: true,
-                                        callback: function(response, convo) {
-                                            convo.repeat();
-                                            convo.next();
-                                        }
-                                    }]);
-                                });
+                        github.repos.createRelease({
+                                user: "zplug",
+                                repo: "test",
+                                tag_name: nextVersion,
+                                name: nextVersion,
+                                body: note == 'skip' ? '' : note,
+                            })
+                            .then(function(res, err) {
+                                var reply_with_attachments = {
+                                    'text': 'zplug ' + res.tag_name + ' has been released!',
+                                    'icon_emoji': config.slack.icon_emoji,
+                                    'username': config.slack.username,
+                                    'attachments': [{
+                                        'fields': [{
+                                            'title': 'Link',
+                                            'value': res.html_url,
+                                            'short': true,
+                                        }, {
+                                            'title': 'Note',
+                                            'value': res.body,
+                                            'short': true,
+                                        }],
+                                    }]
+                                };
+                                return bot.reply(message, reply_with_attachments);
+                            });
                     });
-                });
-            }
+            });
+        });
+    }
 };
 
-controller.hears([/^bot\s+(?:ver|version)(?:\s+(\w+)(?:\s+(.+))?)?\s*$/],
-        ['message_received', 'ambient'],
-        function(bot, message) {
+function exists(filePath) {
+    try {
+        return fs.statSync(filePath).isDirectory();
+    } catch (err) {
+        return false;
+    }
+}
+
+var gitClone = function(bot, message) {
+    if (exists(repo)) {
+        return new Promise(function(resolve, reject) {
+            resolve();
+        });
+    } else {
+        return new Promise(function(resolve, reject) {
+            require('simple-git')()
+                .clone(
+                    'git@github.com:zplug/test',
+                    repo,
+                    function(err, res) {
+                        if (err) {
+                            console.log('error');
+                            reject(err);
+                        } else {
+                            console.log('ok');
+                            resolve();
+                        }
+                        return bot.reply(message, {
+                            text: 'Cloning zplug/test...',
+                            icon_emoji: config.slack.icon_emoji,
+                            username: config.slack.username,
+                        });
+                    })
+                .then(function() {
+                    git
+                        .addConfig('user.name', 'zplug-man')
+                        .addConfig('user.email', 'b4b4r07+zplug@gmail.com')
+                        .removeRemote('origin')
+                        .addRemote('origin', 'git@github.com.zplug:zplug/test.git')
+                });
+        });
+    }
+};
+
+controller.hears(
+    [/^bot\s+(?:ver|version)(?:\s+(\w+)(?:\s+(.+))?)?\s*$/], ['message_received', 'ambient'],
+    function(bot, message) {
+        gitClone(bot, message).then(function() {
             var command = message.match[1] || '';
             var commandProc = commandProcMap[command];
-            if(! commandProc) {
+            if (!commandProc) {
                 return bot.reply(message, format({
                     text: sprintf('Unknown command [%s]', command),
                     color: '#ff0000',
@@ -256,3 +257,4 @@ controller.hears([/^bot\s+(?:ver|version)(?:\s+(\w+)(?:\s+(.+))?)?\s*$/],
             }
             commandProc(bot, message);
         });
+    });
