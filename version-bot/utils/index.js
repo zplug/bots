@@ -3,6 +3,8 @@ var sprintf = require('sprintf');
 var fs = require('fs');
 var config = require('../config/default.json');
 var git = require('simple-git')(config.path.local);
+var exec = require('child_process').exec;
+var replace = require('replace');
 
 function exists(filePath) {
     try {
@@ -53,6 +55,57 @@ module.exports = {
                         .removeRemote('origin')
                         .addRemote('origin', config.github.remote)
                 });
+        });
+    },
+    getVersionStable: function() {
+        var ver = [];
+        fs.readFileSync(config.path.local + "/README.md")
+            .toString()
+            .split('\n')
+            .forEach(function(element, index, array) {
+                if (/^.*stable-v\d+\.\d+\.\d+-e9a326.*$/.test(element)) {
+                    ver = element.match(/\d+\.\d+\.\d+/);
+                }
+            });
+        return ver[0] || '0.0.0';
+    },
+    getVersionLatest: function() {
+        return fs.readFileSync(config.path.local + "/doc/VERSION")
+            .toString()
+            .trim('\n');
+    },
+    replace: function(current, next, branch) {
+        var candidateFiles = {
+            latest: [
+                config.path.local + '/doc/VERSION',
+                config.path.local + '/README.md',
+                config.path.local + '/doc/guide/ja/README.md',
+                config.path.local + '/base/core/core.zsh',
+            ],
+            stable: [
+                config.path.local + '/README.md',
+                config.path.local + '/doc/guide/ja/README.md',
+            ]
+        };
+
+        switch (branch) {
+            case 'latest':
+                var files = candidateFiles.latest;
+                break;
+            case 'stable':
+                var files = candidateFiles.stable;
+                break;
+            default:
+                var files = [];
+                break;
+        }
+
+        replace({
+            regex: current,
+            replacement: next,
+            paths: files,
+            recursive: false,
+            silent: true,
         });
     }
 };

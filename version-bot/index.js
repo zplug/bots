@@ -38,7 +38,7 @@ var commandProcMap = {
 };
 
 controller.hears(
-    [/^bot\s+(?:ver|version)(?:\s+(\w+)(?:\s+(.+))?)?\s*$/], ['message_received', 'ambient'],
+    [/^bot\s+(?:ver|version)(?:\s+(\w+)(?:\s+(\S+)(?:\s+(\S+))?)?)?\s*$/], ['message_received', 'ambient'],
     function(bot, message) {
         utils.gitClone({
             bot: bot,

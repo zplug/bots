@@ -9,13 +9,13 @@
         "text": "A version-controll bot on Slack",
         "fields": [
             {
-                "title": "bot (ver|version) now",
-                "value": "show current version",
+                "title": "bot (ver|version) now [(latest|stable)]",
+                "value": "Show current version. By default, display latest version.",
                 "short": false
             },
             {
-                "title": "bot (ver|version) bump {n.n.n}",
-                "value": "bump version",
+                "title": "bot (ver|version) bump {n.n.n} [(latest|stable)]",
+                "value": "Commit bummping-version to master and create GitHub Releases. By default, bump version of latest.",
                 "short": false
             }
         ],

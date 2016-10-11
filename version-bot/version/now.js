@@ -1,9 +1,24 @@
 var fs = require('fs');
 var semver = require('semver');
+var sprintf = require('sprintf');
 var config = require('../config/default.json');
+var utils = require('../utils');
 
 exports.run = function(bot, message) {
-    var currentVersion = fs.readFileSync(config.path.local + "/doc/VERSION").toString().trim('\n');
+    var branch = message.match[2] || 'latest';
+    switch (branch) {
+        case 'latest':
+            var currentVersion = utils.getVersionLatest();
+            break;
+        case 'stable':
+            var currentVersion = utils.getVersionStable();
+            break;
+        default:
+            return bot.reply(message, utils.format({
+                text: sprintf('%s: no such target', branch),
+                color: config.color.red,
+            }));
+    }
     var reply_with_attachments = {
         'icon_emoji': ':rocket:',
         'username': 'version bot',

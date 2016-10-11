@@ -21,7 +21,20 @@ github.authenticate({
 
 exports.run = function(bot, message) {
     var nextVersion = message.match[2] || '';
-    var currentVersion = fs.readFileSync(config.path.local + "/doc/VERSION").toString().trim('\n');
+    var branch = message.match[3] || 'latest';
+    switch (branch) {
+        case 'latest':
+            var currentVersion = utils.getVersionLatest();
+            break;
+        case 'stable':
+            var currentVersion = utils.getVersionStable();
+            break;
+        default:
+            return bot.reply(message, utils.format({
+                text: sprintf('%s: no such target', branch),
+                color: config.color.red,
+            }));
+    }
 
     if (!semver.valid(nextVersion)) {
         return bot.reply(message, utils.format({
@@ -35,6 +48,31 @@ exports.run = function(bot, message) {
             color: config.color.red,
         }));
     }
+
+    // Endpoint
+    if (branch == 'stable') {
+        git
+            .checkout('.')
+            .pull('origin', 'master')
+            .then(function() {
+                // replace current version with next one in many files
+                utils.replace(currentVersion, nextVersion, branch);
+            })
+            .addConfig('user.name', config.github.username)
+            .addConfig('user.email', config.github.email)
+            .add('./*')
+            .commit(sprintf('Bump %s %s', branch, nextVersion))
+            .push('origin', 'master')
+            .then(function() {
+                bot.reply(message, {
+                    text: sprintf('zplug %s %s has been pushed!', branch, nextVersion),
+                    icon_emoji: config.slack.icon_emoji,
+                    username: config.slack.username,
+                });
+            });
+        return;
+    }
+
     switch (nextVersion) {
         case semver.inc(currentVersion, 'patch'):
         case semver.inc(currentVersion, 'minor'):
@@ -65,23 +103,13 @@ exports.run = function(bot, message) {
                 .checkout('.')
                 .pull('origin', 'master')
                 .then(function() {
-                    replace({
-                        regex: currentVersion,
-                        replacement: nextVersion,
-                        paths: [
-                            config.path.local + '/doc/VERSION',
-                            config.path.local + '/README.md',
-                            config.path.local + '/doc/guide/ja/README.md',
-                            config.path.local + '/base/core/core.zsh',
-                        ],
-                        recursive: false,
-                        silent: true,
-                    });
+                    // replace current version with next one in many files
+                    utils.replace(currentVersion, nextVersion, branch);
                 })
                 .addConfig('user.name', config.github.username)
                 .addConfig('user.email', config.github.email)
                 .add('./*')
-                .commit('Bump ' + nextVersion)
+                .commit(sprintf('Bump %s %s', branch, nextVersion))
                 .push('origin', 'master')
                 .then(function() {
                     bot.reply(message, {
