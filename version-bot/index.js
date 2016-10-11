@@ -18,7 +18,7 @@ var commandProcMap = {
     '': function(bot, message) {
         return bot.reply(message, utils.format({
             text: 'too few arguments',
-            color: '#ff0000',
+            color: config.color.red,
         }));
     },
     help: function(bot, message) {
@@ -49,7 +49,7 @@ controller.hears(
             if (!commandProc) {
                 return bot.reply(message, utils.format({
                     text: sprintf('Unknown command [%s]', command),
-                    color: '#ff0000',
+                    color: config.color.red,
                 }));
             }
             commandProc(bot, message);

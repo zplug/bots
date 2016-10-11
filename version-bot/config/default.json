@@ -16,5 +16,9 @@
         "remote": "git@github.com.zplug:zplug/zplug.git",
         "user": "zplug",
         "repo": "zplug"
+    },
+    "color": {
+        "red": "#ff0000",
+        "green": "#00ff00"
     }
 }

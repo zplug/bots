@@ -5,6 +5,7 @@ var fs = require('fs');
 var semver = require('semver');
 var replace = require('replace');
 var config = require('../config/default.json');
+var utils = require('../utils');
 var git = require('simple-git')(config.path.local);
 
 github = new githubAPI({
@@ -23,18 +24,16 @@ exports.run = function(bot, message) {
     var currentVersion = fs.readFileSync(config.path.local + "/doc/VERSION").toString().trim('\n');
 
     if (!semver.valid(nextVersion)) {
-        return bot.reply(message, {
-            text: 'ERROR: version (n.n.n) is acceptable.',
-            icon_emoji: config.slack.icon_emoji,
-            username: config.slack.username,
-        });
+        return bot.reply(message, utils.format({
+            text: sprintf('%s: invalid format (accepts only {n.n.n} style)', nextVersion),
+            color: config.color.red,
+        }));
     }
     if (!semver.cmp(currentVersion, '<', nextVersion)) {
-        return bot.reply(message, {
-            text: 'ERROR: ' + nextVersion + ' is less than current version ' + currentVersion,
-            icon_emoji: config.slack.icon_emoji,
-            username: config.slack.username,
-        });
+        return bot.reply(message, utils.format({
+            text: sprintf('%s is less than current version %s', nextVersion, currentVersion),
+            color: config.color.red,
+        }));
     }
     switch (nextVersion) {
         case semver.inc(currentVersion, 'patch'):
@@ -42,11 +41,10 @@ exports.run = function(bot, message) {
         case semver.inc(currentVersion, 'major'):
             break;
         default:
-            return bot.reply(message, {
-                text: 'ERROR: ' + nextVersion + ' is too large compared with current version ' + currentVersion,
-                icon_emoji: config.slack.icon_emoji,
-                username: config.slack.username,
-            });
+            return bot.reply(message, utils.format({
+                text: sprintf('%s is too large compared with current version %s', nextVersion, currentVersion),
+                color: config.color.red,
+            }));
     }
 
     var convoCtx = {
@@ -80,6 +78,8 @@ exports.run = function(bot, message) {
                         silent: true,
                     });
                 })
+                .addConfig('user.name', config.github.username)
+                .addConfig('user.email', config.github.email)
                 .add('./*')
                 .commit('Bump ' + nextVersion)
                 .push('origin', 'master')

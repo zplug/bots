@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var sprintf = require('sprintf');
 var fs = require('fs');
 var config = require('../config/default.json');
 var git = require('simple-git')(config.path.local);
