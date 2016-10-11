@@ -14,7 +14,7 @@ if [[ ! -f $dir/$bot/index.js ]]; then
 fi
 
 bot_list="$(
-$dir/node_modules/.bin/forever list \
+forever list \
     | sed '1,2d' \
     | awk '{print $5, $8}' \
     | sort -k2
@@ -23,5 +23,5 @@ $dir/node_modules/.bin/forever list \
 if [[ $2 =~ [0-9]+ ]]; then
     line=$2
 fi
-log_file=$(echo "$bot_list" | grep "$bot" | awk '{print $2}')
+log_file=$(echo "$bot_list" | grep "/$bot/" | awk '{print $2}')
 tail -n ${line:-30} "$log_file"

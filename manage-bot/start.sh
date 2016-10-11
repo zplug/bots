@@ -4,7 +4,7 @@ dir="$(cd $(dirname $0)/..; pwd)"
 
 ret=0
 bot="$1"
-forever=$dir/node_modules/.bin/forever
+forever=forever
 
 if [[ -z $bot ]] || [[ $bot == undefined ]]; then
     echo "specify bot name" >&2

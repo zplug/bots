@@ -2,7 +2,7 @@
 
 dir="$(cd $(dirname $0)/..; pwd)"
 bot_list="$(
-$dir/node_modules/.bin/forever list \
+forever list \
     | sed '1,2d' \
     | awk '{print $3, $5, $9}'
 )"
@@ -11,8 +11,8 @@ printf '['
 for bot in $dir/*-bot/index.js
 do
     bot_name=$(echo $bot | xargs dirname | xargs basename)
-    pid=$(echo "$bot_list" | grep $bot_name | awk '{print $1}')
-    uptime=$(echo "$bot_list" | grep $bot_name | awk '{print $3}')
+    pid=$(echo "$bot_list" | grep "/$bot_name/" | awk '{print $1}')
+    uptime=$(echo "$bot_list" | grep "/$bot_name/" | awk '{print $3}')
     emoji=$(awk '/Help:$/{getline;print}' $bot | sed 's/^[^:]*://;s/:[^:]*$//')
     uptime="$(echo $uptime | perl -pe 's/(\d+):(\d+):(\d+):(\d+)\.(\d+)/$1 days $2:$3:$4/')"
     printf '{'
