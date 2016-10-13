@@ -4,7 +4,7 @@ slack_token="$(env | grep '^SLACK_TOKEN' | sed 's/SLACK_TOKEN=//')"
 github_token="$(env | grep '^GITHUB_ACCESS_TOKEN' | sed 's/GITHUB_ACCESS_TOKEN=//')"
 travis_ci_token="$(env | grep '^TRAVIS_CI_TOKEN' | sed 's/TRAVIS_CI_TOKEN=//')"
 
-if [[ -z $slack_token ]] || [[ -z $github_token ]] [[ -z $travis_ci_token ]]; then
+if [[ -z $slack_token ]] || [[ -z $github_token ]] || [[ -z $travis_ci_token ]]; then
     printf 'tokens are invalid...\n' >&2
     exit 1
 fi
@@ -19,7 +19,7 @@ done
 
 case "$1" in
     'start' | 'stop' | 'restart')
-        for js in ./*-bot/index.js
+        for js in $PWD/*-bot/index.js
         do
             forever "$1" "$js"
         done
