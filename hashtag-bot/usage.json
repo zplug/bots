@@ -10,7 +10,7 @@
         "fields": [
             {
                 "title": "{#nnn}",
-                "value": "link number to github issues/pull-reqs",
+                "value": "Expand GitHub permalinks (it's cached if successive)",
                 "short": false
             }
         ],

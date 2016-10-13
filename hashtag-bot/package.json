@@ -1,0 +1,17 @@
+{
+  "name": "hashtag-bot",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "b4b4r07",
+  "license": "MIT",
+  "dependencies": {
+    "sprintf": "~0.1.5",
+    "botkit": "~0.4.0",
+    "memory-cache": "~0.1.6",
+    "slack-node": "~0.1.8"
+  }
+}
