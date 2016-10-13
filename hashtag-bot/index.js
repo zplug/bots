@@ -39,6 +39,8 @@ var say = function(bot, message, hash) {
         });
         // Rich reply
         github.get(num, function(reply_with_attachments) {
+            reply_with_attachments.icon_emoji = ':hash:'
+            reply_with_attachments.username = 'hashtag bot';
             bot.reply(message, reply_with_attachments);
         });
         return;
