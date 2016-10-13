@@ -28,9 +28,10 @@ controller.hears('', ['direct_mention', 'mention', 'ambient'],
 
 var say = function(bot, message, hash) {
     var num = hash.replace('#', '');
-    if (cache.get(hash) === null) {
-        notified[hash] = false;
-        cache.put(hash, hash, 60 * 1000 * 10); // 10 min
+    var key = hash+message.channel; // for each channel
+    if (cache.get(key) === null) {
+        notified[key] = false;
+        cache.put(key, key, 60 * 1000 * 10); // 10 min
 
         return bot.reply(message, {
             text: sprintf('https://github.com/zplug/zplug/issues/%s', num),
@@ -47,7 +48,7 @@ var say = function(bot, message, hash) {
     }
 
     // Send DM for the first time only if hash is cached
-    if (notified[hash] == false) {
+    if (notified[key] == false) {
         slack.api('chat.postMessage', {
             text: sprintf('<https://github.com/zplug/zplug/issues/%s|%s>: Not display permalink to be cached (10 min)', num, hash),
             username: 'hashtag bot',
@@ -56,6 +57,6 @@ var say = function(bot, message, hash) {
         }, function(err, response) {
             if (err) console.log(err);
         });
-        notified[hash] = true;
+        notified[key] = true;
     }
 };
