@@ -4,6 +4,7 @@ var cache = require('memory-cache');
 var Slack = require('slack-node');
 
 var SLACK_TOKEN = process.env.SLACK_TOKEN;
+var github = require('./github');
 
 slack = new Slack(SLACK_TOKEN);
 
@@ -21,28 +22,35 @@ controller.hears('', ['direct_mention', 'mention', 'ambient'],
     function(bot, message) {
         var matches = message.text.match(/#[0-9]+/g);
         matches.forEach(function(hash) {
-            bot.reply(message, {
-                text: getPermalink(hash, message.user),
-                icon_emoji: ':hash:',
-                username: 'hashtag bot',
-            });
+            say(bot, message, hash);
         });
     });
 
-var getPermalink = function(hash, user) {
+var say = function(bot, message, hash) {
+    var num = hash.replace('#', '');
     if (cache.get(hash) === null) {
         notified[hash] = false;
         cache.put(hash, hash, 60 * 1000 * 10); // 10 min
-        return sprintf('https://github.com/zplug/zplug/issues/%s', hash.replace('#', ''))
+
+        return bot.reply(message, {
+            text: sprintf('https://github.com/zplug/zplug/issues/%s', num),
+            icon_emoji: ':hash:',
+            username: 'hashtag bot',
+        });
+        // Rich reply
+        github.get(num, function(reply_with_attachments) {
+            bot.reply(message, reply_with_attachments);
+        });
+        return;
     }
 
     // Send DM for the first time only if hash is cached
     if (notified[hash] == false) {
         slack.api('chat.postMessage', {
-            text: hash + ': Not display permalink to be cached (10 min)',
+            text: sprintf('<https://github.com/zplug/zplug/issues/%s|%s>: Not display permalink to be cached (10 min)', num, hash),
             username: 'hashtag bot',
             icon_emoji: ':hash:',
-            channel: user,
+            channel: message.user,
         }, function(err, response) {
             if (err) console.log(err);
         });
