@@ -22,28 +22,6 @@ var format = function(args) {
     }
 }
 
-/*
-controller.hears(['^bot\\s+help(\\s+(\\S+))?'],
-        ['message_received', 'ambient'],
-        function(bot, message) {
-            var name = message.match[1];
-            exec(__dirname + '/help.sh ' + name, function(err, stdout, stderr){
-                if (err) {
-                    return bot.reply(message, format({
-                        text: stderr,
-                        color: '#ff0000',
-                    }));
-                }
-                var attachments = JSON.parse(stdout);
-                return bot.reply(message, {
-                    attachments: attachments,
-                    icon_emoji: ':question:',
-                    username: 'help bot',
-                });
-            });
-        });
-        */
-
 controller.hears(['^bot\\s+(help|usage)(\\s+(\\S+))?'],
         ['message_received', 'ambient'],
         function(bot, message) {

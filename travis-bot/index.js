@@ -5,7 +5,7 @@ var Promise = require('bluebird')
 var sprintf = require('sprintf')
 
 var SLACK_TOKEN = process.env.SLACK_TOKEN;
-var TRAVIS_CI_TOKEN = process.env.TRAVIS_TOKEN;
+var TRAVIS_CI_TOKEN = process.env.TRAVIS_CI_TOKEN;
 
 var controller = botkit.slackbot({
     debug: false
