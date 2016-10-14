@@ -4,12 +4,12 @@
         "local": "/tmp/zplug"
     },
     "slack": {
-        "token": "",
+        "token": "SLACK_TOKEN",
         "username": "version bot",
         "icon_emoji": ":rocket:"
     },
     "github": {
-        "token": "",
+        "token": "GITHUB_ACCESS_TOKEN",
         "username": "zplug-man",
         "email": "b4b4r07+zplug@gmail.com",
         "url": "git@github.com:zplug/zplug",

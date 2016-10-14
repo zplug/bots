@@ -16,6 +16,12 @@ do
     perl -pi -e 's/^(var GITHUB_ACCESS_TOKEN = )(.+;)$/$1"'$github_token'";/g' "$js"
     perl -pi -e 's/^(var TRAVIS_CI_TOKEN = )(.+;)$/$1"'$travis_ci_token'";/g' "$js"
 done
+for js in ./*-bot/config/*.json
+do
+    perl -pi -e 's/"SLACK_TOKEN"/"'$slack_token'"/g' "$js"
+    perl -pi -e 's/"GITHUB_ACCESS_TOKEN"/"'$github_token'"/g' "$js"
+    perl -pi -e 's/"TRAVIS_CI_TOKEN"/"'$travis_ci_token'"/g' "$js"
+done
 
 case "$1" in
     'start' | 'stop' | 'restart')
