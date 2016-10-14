@@ -18,10 +18,11 @@ github.authenticate({
     token: GITHUB_ACCESS_TOKEN,
 });
 
-var result = [];
+var result = []; // for process cache
 var color = COLOR_NOT_FOUND;
 
 function getForRepo(callback) {
+    // use process cache
     if (result.length > 0) {
         callback(result);
         return;
@@ -72,62 +73,46 @@ function checkLimit(data) {
     }
 }
 
-function parseResponse(num, callback) {
+function selectOneFromResponse(num, callback) {
     getForRepo(function(result) {
         var r = result.filter(function(item, index) {
             if (item.number == num) return true;
         });
         var resp = r[0];
         if (!resp) {
-            var reply = {
-                'icon_emoji': ':hash:',
-                'username': 'hashtag bot',
-                'attachments': [{
-                    'title': '404 Not Found',
-                    'title_link': 'https://github.com/zplug/zplug',
-                    'text': sprintf('#%s is not the web page you are looking for.', num),
-                    'color': COLOR_NOT_FOUND,
-                    'thumb_url': 'https://octodex.github.com/images/octobiwan.jpg',
-                    'footer': 'GitHub',
-                    'ts': moment().format('X')
-                }]
-            }
+            var reply = [{
+                'title': '404 Not Found',
+                'title_link': 'https://github.com/zplug/zplug',
+                'text': sprintf('#%s is not the web page you are looking for.', num),
+                'color': COLOR_NOT_FOUND,
+                'thumb_url': 'https://octodex.github.com/images/octobiwan.jpg',
+                'footer': 'GitHub',
+                'ts': moment().format('X')
+            }];
             callback(reply);
             return;
         }
         if (resp.pull_request !== undefined) {
-            if (resp.state == 'open') {
-                color = COLOR_OPEN;
-            } else {
-                color = COLOR_MERGED;
-            }
+            color = resp.state == 'open' ? COLOR_OPEN : COLOR_MERGED
         } else {
-            if (resp.state == 'open') {
-                color = COLOR_OPEN;
-            } else {
-                color = COLOR_CLOSED;
-            }
+            color = resp.state == 'open' ? COLOR_OPEN : COLOR_CLOSED;
         }
 
-        var reply = {
-            'icon_emoji': ':hash:',
-            'username': 'hashtag bot',
-            'attachments': [{
-                'title': sprintf('%s (#%d)', resp.title, resp.number),
-                'title_link': resp.html_url,
-                'text': resp.body,
-                'color': color,
-                'thumb_url': resp.user.avatar_url,
-                'footer': resp.pull_request === undefined ? 'Issues' : 'Pull Requests',
-                'ts': moment(resp.created_at).format('X')
-            }]
-        };
+        var reply = [{
+            'title': sprintf('%s (#%d)', resp.title, resp.number),
+            'title_link': resp.html_url,
+            'text': resp.body,
+            'color': color,
+            'thumb_url': resp.user.avatar_url,
+            'footer': resp.pull_request === undefined ? 'Issues' : 'Pull Requests',
+            'ts': moment(resp.created_at).format('X')
+        }];
         callback(reply);
     });
 }
 
 exports.get = getForRepo;
-exports.res = parseResponse;
+exports.select = selectOneFromResponse;
 
 // Get all issues when initial running
 getForRepo(function() {

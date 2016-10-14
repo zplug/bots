@@ -23,7 +23,7 @@ controller.spawn({
         throw new Error('Could not connect to Slack');
     }
     new CronJob({
-        cronTime: '0 */1 * * *',
+        cronTime: '0 */1 * * *', // ever hour
         onTick: function() {
             github.get(function(result) {
                 var now = moment().format("YYYY-MM-DD HH:mm:ssZ");
@@ -52,21 +52,27 @@ var Say = function(bot, message, hash) {
         notified[key] = false;
         cache.put(key, key, 60 * 1000 * 10); // 10 min
 
-        github.res(num, function(reply) {
-            return bot.reply(message, reply);
+        github.select(num, function(resp) {
+            return bot.reply(message, {
+                icon_emoji: ':hash:',
+                username: 'hashtag bot',
+                attachments: resp,
+            });
         });
         return;
     }
 
     // Send DM for the first time only if hash is cached
-    if (notified[key] == false) {
+    if (!notified[key]) {
         slack.api('chat.postMessage', {
             text: sprintf('<https://github.com/zplug/zplug/issues/%s|%s>: Not display permalink to be cached (10 min)', num, hash),
             username: 'hashtag bot',
             icon_emoji: ':hash:',
             channel: message.user,
-        }, function(err, response) {
-            if (err) console.log(err);
+        }, function(err, resp) {
+            if (err) {
+                console.log(err);
+            }
         });
         notified[key] = true;
     }
