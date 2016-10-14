@@ -2,9 +2,11 @@ var sprintf = require('sprintf');
 var botkit = require('botkit');
 var cache = require('memory-cache');
 var Slack = require('slack-node');
+var CronJob = require('cron').CronJob;
+var moment = require('moment');
+var github = require('./github');
 
 var SLACK_TOKEN = process.env.SLACK_TOKEN;
-var github = require('./github');
 
 slack = new Slack(SLACK_TOKEN);
 
@@ -16,33 +18,42 @@ var controller = botkit.slackbot({
 
 controller.spawn({
     token: SLACK_TOKEN
-}).startRTM();
+}).startRTM(function(err, bot, payload) {
+    if (err) {
+        throw new Error('Could not connect to Slack');
+    }
+    new CronJob({
+        cronTime: '0 */1 * * *',
+        onTick: function() {
+            github.get(function(result) {
+                var now = moment().format("YYYY-MM-DD HH:mm:ssZ");
+                bot.botkit.log(now + ': Fetched ' + result.length + ' items.');
+                bot.botkit.log(now + ': Cleared cache.');
+                cache.clear();
+            });
+        },
+        start: true,
+        timeZone: 'Asia/Tokyo'
+    });
+});
 
 controller.hears('', ['direct_mention', 'mention', 'ambient'],
     function(bot, message) {
         var matches = message.text.match(/#[0-9]+/g);
         matches.forEach(function(hash) {
-            say(bot, message, hash);
+            Say(bot, message, hash);
         });
     });
 
-var say = function(bot, message, hash) {
+var Say = function(bot, message, hash) {
     var num = hash.replace('#', '');
-    var key = hash+message.channel; // for each channel
+    var key = hash + message.channel; // for each channel
     if (cache.get(key) === null) {
         notified[key] = false;
         cache.put(key, key, 60 * 1000 * 10); // 10 min
 
-        return bot.reply(message, {
-            text: sprintf('https://github.com/zplug/zplug/issues/%s', num),
-            icon_emoji: ':hash:',
-            username: 'hashtag bot',
-        });
-        // Rich reply
-        github.get(num, function(reply_with_attachments) {
-            reply_with_attachments.icon_emoji = ':hash:'
-            reply_with_attachments.username = 'hashtag bot';
-            bot.reply(message, reply_with_attachments);
+        github.res(num, function(reply) {
+            return bot.reply(message, reply);
         });
         return;
     }

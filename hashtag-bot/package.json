@@ -9,11 +9,12 @@
   "author": "b4b4r07",
   "license": "MIT",
   "dependencies": {
-    "sprintf": "~0.1.5",
     "botkit": "~0.4.0",
+    "cron": "^1.1.1",
+    "github": "4.0.0",
     "memory-cache": "~0.1.6",
+    "moment": "^2.15.1",
     "slack-node": "~0.1.8",
-    "github": "~5.2.0",
-    "moment": "~2.15.1"
+    "sprintf": "~0.1.5"
   }
 }
