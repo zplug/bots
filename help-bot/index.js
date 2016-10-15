@@ -1,69 +1,96 @@
 var botkit = require('botkit');
 var exec = require('child_process').exec;
+var path = require('path');
+var sprintf = require('sprintf');
+var fs = require('fs');
+var Glob = require("glob").Glob;
 
-var SLACK_TOKEN = process.env.SLACK_TOKEN;
+var fields = [],
+    titles = [],
+    count = 0,
+    config = {
+        slack: {
+            token: process.env.SLACK_TOKEN,
+            icon_emoji: ':question:',
+            username: 'help bot',
+        },
+        color: {
+            red: '#ff0000',
+        }
+    }
 
 var controller = botkit.slackbot({
     debug: false
 });
 
 controller.spawn({
-    token: SLACK_TOKEN
+    token: config.slack.token
 }).startRTM();
 
-var format = function(args) {
-    return {
-        'username': 'help bot' ,
-        'attachments': [{
-            'text': args.text,
-            'color': args.color,
-        }],
-        'icon_emoji': ':question:'
-    }
-}
-
-controller.hears(['^bot\\s+(help|usage)(\\s+(\\S+))?'],
-        ['message_received', 'ambient'],
-        function(bot, message) {
-            var name = message.match[2];
-            if (typeof name != "undefined") {
-                var attachments = require(__dirname + '/../' + name.trim() + '/usage.json');
+controller.hears([/^bot\s+(help|usage)(\s+(\S+))?/], ['message_received', 'ambient'],
+    function(bot, message) {
+        var name = message.match[3];
+        if (typeof name !== 'undefined') {
+            var json = sprintf('%s/../%s/usage.json', __dirname, name);
+            if (!isExists(json)) {
                 return bot.reply(message, {
-                    attachments: attachments,
-                    icon_emoji: ':question:',
-                    username: 'help bot',
+                    attachments: [{
+                        text: name + ': no such bot',
+                        color: config.color.red,
+                    }],
+                    icon_emoji: config.slack.icon_emoji,
+                    username: config.slack.username,
                 });
             }
+            var attachments = require(json);
+            return bot.reply(message, {
+                attachments: attachments,
+                icon_emoji: config.slack.icon_emoji,
+                username: config.slack.username,
+            });
+        }
 
-            var fields = [];
-            var Glob = require("glob").Glob;
-            var mg = new Glob(__dirname + "/../*-bot/usage.json", {mark: true}, function(err, matches) {
-                if (err) {
-                    return bot.reply(message, format({
-                        text: stderr,
-                        color: '#ff0000',
-                    }));
-                }
-                matches.forEach(function(match, i) {
-                    var titles = [];
-                    var usage = require(match);
-                    usage[0].fields.forEach(function(f, _) {
+        Glob(__dirname + "/../*-bot/usage.json", {
+            mark: true
+        }, function(err, matches) {
+            if (err) {
+                return bot.reply(message, {
+                    attachments: [{
+                        text: err,
+                        color: config.color.red
+                    }]
+                });
+            }
+            matches.forEach(function(match) {
+                json = require(match);
+                json.forEach(function(u) {
+                    titles = [];
+                    u.fields.forEach(function(f) {
                         titles.push(f.title);
                     });
-                    fields[i] = {
-                        'title': usage[0].author_name,
+                    fields[count++] = {
+                        'title': u.author_name,
                         'value': titles.join('\n'),
                         'short': false,
                     };
                 });
-                var attachments = [{
+            });
+            return bot.reply(message, {
+                attachments: [{
                     pretext: 'For more info, type "bot help xxx-bot" to show usage!',
                     fields: fields,
-                }];
-                return bot.reply(message, {
-                    attachments: attachments,
-                    icon_emoji: ':question:',
-                    username: 'help bot',
-                });
+                }],
+                icon_emoji: config.slack.icon_emoji,
+                username: config.slack.username,
             });
         });
+    });
+
+function isExists(file) {
+    try {
+        fs.statSync(file);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
