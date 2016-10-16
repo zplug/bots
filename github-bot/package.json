@@ -1,0 +1,17 @@
+{
+  "name": "github-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "b4b4r07",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "botkit": "^0.4.0",
+    "github": "4.0.0",
+    "sprintf": "^0.1.5"
+  }
+}
