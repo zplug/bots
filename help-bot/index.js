@@ -31,7 +31,7 @@ controller.hears([/^bot\s+(help|usage)(\s+(\S+))?/], ['message_received', 'ambie
     function(bot, message) {
         var name = message.match[3];
         if (typeof name !== 'undefined') {
-            var json = sprintf('%s/../%s/usage.json', __dirname, name);
+            var json = path.join(__dirname, '..', name, 'usage.json');
             if (!isExists(json)) {
                 return bot.reply(message, {
                     attachments: [{
@@ -50,8 +50,9 @@ controller.hears([/^bot\s+(help|usage)(\s+(\S+))?/], ['message_received', 'ambie
             });
         }
 
-        Glob(__dirname + "/../*-bot/usage.json", {
-            mark: true
+        Glob('../*-bot/usage.json', {
+            cwd: __dirname,
+            silent: true,
         }, function(err, matches) {
             if (err) {
                 return bot.reply(message, {
